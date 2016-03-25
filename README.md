@@ -1,7 +1,5 @@
 ## StatsD client in Common Lisp
 
-Only udp transport. No pipelining
-
 ```lisp
 (let ((statsd:*client* (statsd:make-sync-client)))
   (loop for i from 0 to 99 do
@@ -13,7 +11,6 @@ Only udp transport. No pipelining
 
 ## TODO
 
-- [ ] TCP Transport
 - [ ] Tests
 - [ ] Auto-reconnects for async client
 - [ ] Pipelines
