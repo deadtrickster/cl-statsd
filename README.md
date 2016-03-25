@@ -12,7 +12,7 @@
 ## TODO
 
 - [ ] Tests
-- [ ] Auto-reconnects for async client
+- [x] Auto-reconnects for async client
 - [ ] Pipelines
 
 ## License
