@@ -8,18 +8,42 @@
    (thread :reader async-client-thread)
    (mailbox :initform (safe-queue:make-mailbox) :reader async-client-mailbox)))
 
-(defun make-async-client (&key (transport :usocket) (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (protocol :datagram)) 
-  (make-instance 'async-client :reconnects reconnects :transport (make-transport transport host port protocol)))
+(defun make-async-client (&key (error-handler :ignore) (transport :usocket) (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (tcp-p))
+  (make-instance 'async-client :error-handler error-handler
+                               :reconnects reconnects
+                               :transport (make-transport transport host port tcp-p)))
 
 (defun async-client-thread-fun (client)
-  (loop
-    as recv = (safe-queue:mailbox-receive-message (async-client-mailbox client)) do
-       (cond
-         ((stringp recv)
-          (transport.send client recv))
-         ((eql recv :stop)
-          (setf (slot-value client 'state) :stopped)
-          (return)))))
+  (setf (slot-value client 'state) :running)
+  (let ((max-reconnects (or (async-client-reconnects client) 1)))
+    (loop
+      as recv = (safe-queue:mailbox-receive-message (async-client-mailbox client)) do
+         (cond
+           ((stringp recv)
+            (let ((retries 1)                  
+                  (sleep 1))
+              (tagbody
+               :retry
+                 (handler-bind
+                     ((transport-error
+                        (lambda (e)
+                          (declare (ignore e))
+                          (if (and
+                               (< retries max-reconnects)
+                               (ignore-errors (transport.connect (client-transport client))))
+                              (progn
+                                (sleep (* sleep retries))
+                                (incf retries)
+                                (go :retry))
+                              (setf (slot-value client 'state) :stopped))))
+                      (t (lambda (e)
+                           (declare (ignore e))
+                           (setf (slot-value client 'state) :stopped)
+                           (return))))
+                   (transport.send (client-transport client) recv)))))
+           ((eql recv :stop)
+            (setf (slot-value client 'state) :stopped)
+            (return))))))
 
 (defun start-async-client (&optional (client *client*))
   (setf (slot-value client 'thread)
@@ -31,7 +55,7 @@
     (safe-queue:mailbox-send-message (async-client-mailbox client) :stop)
     (let ((thread (async-client-thread client)))
       #-sbcl
-      (progn        
+      (progn
         (log:info "Careless abort")
         (sleep timeout)
         (when (bt:thread-alive-p thread)
@@ -51,9 +75,11 @@
     (call-next-method)))
 
 (defmethod send ((client async-client) metric key value rate)
-  (maybe-send rate
-    (case (async-client-state client)
-      (:created (start-async-client client))
-      (:stopped (error "Async Statsd client stopped"))
-      (t))
-    (safe-queue:mailbox-send-message (async-client-mailbox client) (serialize-metric metric key value rate))))
+  (with-smart?-error-handling client
+    (maybe-send rate
+      (ecase (async-client-state client)
+        (:created (start-async-client client))
+        (:stopped (error "Async Statsd client stopped"))
+        (:running))
+      (safe-queue:mailbox-send-message (async-client-mailbox client) (serialize-metric metric key value rate))
+      value)))
