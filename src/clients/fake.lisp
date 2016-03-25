@@ -5,7 +5,8 @@
 
 (defmethod send ((client fake-client) metric key value rate)
   (maybe-send rate
-    (push (serialize-metric metric key value rate) (fake-client-queue client))))
+    (push (serialize-metric metric key value rate) (fake-client-queue client)))
+  value)
 
 (defun fake-client-recv (&optional (fc *client*))
   (pop (fake-client-queue fc)))

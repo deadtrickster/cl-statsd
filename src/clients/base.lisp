@@ -2,8 +2,27 @@
 
 (cl-interpol:enable-interpol-syntax)
 
+(defgeneric handler-handle-error (handler e)
+  (:method ((handler (eql :ignore)) e)
+    (declare (ignore handler e))
+    (throw 'ignore-error nil))
+  (:method ((handler (eql :throw)) e)
+    (declare (ignore handler e))))
+
 (defclass statsd-client-base ()
-  ())
+  ((error-handler :initform :ignore :initarg :error-handler :reader client-error-handler)))
+
+(defun client-handler-error (client e)
+  (handler-handle-error (client-error-handler client) e))
+
+(defmacro with-smart?-error-handling (client &body body)
+  (with-gensyms (client-var)
+    `(let ((,client-var ,client))
+       (catch 'ignore-error
+          (handler-bind ((error
+                           (lambda (e)
+                             (client-handler-error ,client-var e))))
+            ,@body)))))
 
 (defparameter *random-range* 100)
 
