@@ -5,6 +5,8 @@
 
 (defgeneric make-transport (transport host port protocol))
 
+(defgeneric transport.connect (transport))
+
 (defgeneric transport.send (transport metrics))
 
 (defgeneric transport.close (transport))

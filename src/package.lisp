@@ -9,14 +9,22 @@
            #:with-timing
            #:guage
            #:set
+           ;; transports
+           #:transport-base
+           #:socket-transport
+           #:make-transport
+           #:transport.connect
+           #:transport.send
+           #:transport.close
            ;; clients
            #:*client*
-           #:fake-client
+           #:make-null-client
+           #:make-fake-client
            #:fake-client-recv
-           #:null-client
-           #:sync-client
            #:make-sync-client
-           #:async-client
            #:make-async-client
            #:start-async-client
-           #:stop-async-client))
+           #:stop-async-client
+           ;; errors
+           #:transport-error
+           #:handler-handle-error))
