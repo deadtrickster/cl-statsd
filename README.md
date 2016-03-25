@@ -16,6 +16,7 @@ Only udp transport. No pipelining
 - [ ] TCP Transport
 - [ ] Tests
 - [ ] Auto-reconnects for async client
+- [ ] Pipelines
 
 ## License
 MIT
