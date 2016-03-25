@@ -1,16 +1,21 @@
 ## StatsD client in Common Lisp
 
+## Speed
+CL-STATSD is relatively fast:
+
 ```lisp
-(let ((statsd:*client* (statsd:make-sync-client)))
-  (loop for i from 0 to 99 do
-    (statsd:counter "example" (random 100))
-    (sleep 1)))
+(let ((statsd::*client* (statsd:make-sync-client)))
+  (loop for i from 0 to 999999 do
+    (statsd:counter "self-test" 1)))
 ```
 
-![Result](http://i.imgur.com/OnfuYng.png)
+Using [this](https://github.com/hopsoft/docker-graphite-statsd) Docker image with defaults
+on busy VM.
+
+![Result](http://i.imgur.com/mrBf35w.png)
 
 ## Error handling
-By default all error simply ignored. You can customize this behaviour 
+By default all errors simply ignored. You can customize this behaviour 
 by providing :error-handler strategy:
 ```lisp
 (let ((statsd:*client* (statsd:make-sync-client :error-handler :throw)))
