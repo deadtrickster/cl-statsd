@@ -2,22 +2,21 @@
 
 (defconstant +async-client-reconnects-default+ 5)
 
-(defclass async-client (statsd-client-base udp-transport)
-  ((socket :initarg :socket :reader sync-client-socket)
-   (reconnects :initarg :reconnects :initform +async-client-reconnects-default+ :reader async-client-reconnects)
+(defclass async-client (statsd-client-with-transport)
+  ((reconnects :initarg :reconnects :initform +async-client-reconnects-default+ :reader async-client-reconnects)
    (state :initform :created :reader async-client-state)
    (thread :reader async-client-thread)
    (mailbox :initform (safe-queue:make-mailbox) :reader async-client-mailbox)))
 
-(defun make-async-client (&key (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (protocol :datagram)) 
-  (make-instance 'async-client :reconnects reconnects :socket (usocket:socket-connect host port :protocol protocol)))
+(defun make-async-client (&key (transport :usocket) (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (protocol :datagram)) 
+  (make-instance 'async-client :reconnects reconnects :transport (make-transport transport host port protocol)))
 
 (defun async-client-thread-fun (client)
   (loop
     as recv = (safe-queue:mailbox-receive-message (async-client-mailbox client)) do
        (cond
          ((stringp recv)
-          (transport-send client recv))
+          (transport.send client recv))
          ((eql recv :stop)
           (setf (slot-value client 'state) :stopped)
           (return)))))
@@ -27,8 +26,8 @@
         (bt:make-thread (lambda () (async-client-thread-fun client))))
   client)
 
-(defun stop-async-client (&key (client *client*) (timeout 10))
-  (when (eql (async-client-state client) :runnning)
+(defmethod stop-client% ((client async-client) timeout)
+  (when (eql (async-client-state client) :running)
     (safe-queue:mailbox-send-message (async-client-mailbox client) :stop)
     (let ((thread (async-client-thread client)))
       #-sbcl
@@ -48,7 +47,8 @@
                   (:timeout (log:error "Async StatsD client thread stalled?")
                    (sb-thread:terminate-thread thread))
                   (:abort (log:error "Async StatsD client thread aborted"))
-                  (t (log:error "Async StatsD client thread state is unknown"))))))))))
+                  (t (log:error "Async StatsD client thread state is unknown"))))))))
+    (call-next-method)))
 
 (defmethod send ((client async-client) metric key value rate)
   (maybe-send rate

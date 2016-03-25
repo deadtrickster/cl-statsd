@@ -37,3 +37,16 @@
   (serialize-metric% "s" key value rate))
 
 (defgeneric send (client metric key value rate))
+
+(defgeneric stop-client% (client timeout)
+  (:method (client timeout)))
+
+(defun stop-client (&key (client *client*) (timeout 10))
+  (stop-client% client timeout))
+
+(defclass statsd-client-with-transport (statsd-client-base)
+  ((transport :initarg :transport :reader client-transport)))
+
+(defmethod stop-client% ((client statsd-client-with-transport) timeout)
+  (declare (ignore timeout))
+  (transport.close (client-transport client)))

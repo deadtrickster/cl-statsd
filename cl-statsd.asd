@@ -19,7 +19,9 @@
                  (:file "statsd")
                  (:module "transports"
                   :serial t
-                  ((:file "udp")))
+                  :components
+                  ((:file "base")
+                   (:file "usocket")))
                  (:module "clients"
                   :serial t
                   :components
