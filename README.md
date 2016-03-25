@@ -15,7 +15,7 @@ on busy VM.
 ![Result](http://i.imgur.com/mrBf35w.png)
 
 ## Error handling
-By default all error simply ignored. You can customize this behaviour 
+By default all errors simply ignored. You can customize this behaviour 
 by providing :error-handler strategy:
 ```lisp
 (let ((statsd:*client* (statsd:make-sync-client :error-handler :throw)))
