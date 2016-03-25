@@ -11,5 +11,11 @@ Only udp transport. No pipelining
 
 ![Result](http://i.imgur.com/OnfuYng.png)
 
+## TODO
+
+- [ ] TCP Transport
+- [ ] Tests
+- [ ] Auto-reconnects for async client
+
 ## License
 MIT
