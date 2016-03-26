@@ -46,9 +46,8 @@ New transports can be created by specializing
 
 
 ## TODO
-
-- [ ] Tests
-- [x] Auto-reconnects for async client
+- [ ] Async client throttling
+- [ ] Travis CI integration
 - [ ] Pipelines
 
 ## License
