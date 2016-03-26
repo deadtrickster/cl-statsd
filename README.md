@@ -46,7 +46,7 @@ New transports can be created by specializing
 
 
 ## TODO
-
+- [ ] Async client throttling
 - [ ] Travis CI integration
 - [ ] Pipelines
 
