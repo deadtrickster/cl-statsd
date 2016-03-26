@@ -1,4 +1,4 @@
-## StatsD client in Common Lisp
+## [StatsD](https://github.com/etsy/statsd) client in Common Lisp
 
 ## Speed
 CL-STATSD is relatively fast:
