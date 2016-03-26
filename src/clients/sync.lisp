@@ -3,8 +3,9 @@
 (defclass sync-client (statsd-client-with-transport)
   ())
 
-(defun make-sync-client (&key (error-handler :ignore) (transport :usocket) (host "127.0.0.1") (port 8125) (tcp-p))
-  (make-instance 'sync-client :error-handler error-handler
+(defun make-sync-client (&key prefix (error-handler :ignore) (transport :usocket) (host "127.0.0.1") (port 8125) (tcp-p))
+  (make-instance 'sync-client :prefix prefix
+                              :error-handler error-handler
                               :transport (make-transport transport host port tcp-p)))
 
 (defmethod send ((client sync-client) metric key value rate)

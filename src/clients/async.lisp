@@ -8,8 +8,9 @@
    (thread :reader async-client-thread)
    (mailbox :initform (safe-queue:make-mailbox) :reader async-client-mailbox)))
 
-(defun make-async-client (&key (error-handler :ignore) (transport :usocket) (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (tcp-p))
-  (make-instance 'async-client :error-handler error-handler
+(defun make-async-client (&key prefix (error-handler :ignore) (transport :usocket) (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (tcp-p))
+  (make-instance 'async-client :prefix prefix
+                               :error-handler error-handler
                                :reconnects reconnects
                                :transport (make-transport transport host port tcp-p)))
 

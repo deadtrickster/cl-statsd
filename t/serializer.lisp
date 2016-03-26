@@ -9,6 +9,11 @@
 (plan 1)
 
 (subtest "Protocol serializer"
+  (subtest "Prefix"
+    (let ((statsd::*client* (statsd:make-fake-client :prefix "qwe")))
+      (statsd:counter "qwe" 1)
+      (is (statsd:fake-client-recv) "qwe.qwe:1|c")))
+  
   (subtest "Counter"
     (is (with-fake-client (statsd:counter "app.example" 3)) "app.example:3|c")
     (is (with-fake-client (statsd:counter "app.example" 3 :rate 0.23)) "app.example:3|c|@0.23"))

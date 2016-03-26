@@ -1,10 +1,10 @@
 (in-package :cl-statsd)
 
-(defclass fake-client (statsd-client-base)
+(defclass fake-client (statsd-client-with-prefix)
   ((queue :initform (list) :accessor fake-client-queue)))
 
-(defun make-fake-client ()
-  (make-instance 'fake-client))
+(defun make-fake-client (&key prefix)
+  (make-instance 'fake-client :prefix prefix))
 
 (defmethod send ((client fake-client) metric key value rate)
   (maybe-send rate

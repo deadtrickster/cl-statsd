@@ -12,6 +12,9 @@
 (defclass statsd-client-base ()
   ((error-handler :initform :ignore :initarg :error-handler :reader client-error-handler)))
 
+(defclass statsd-client-with-prefix (statsd-client-base)
+  ((prefix :initarg :prefix :initform nil :reader client-prefix)))
+
 (defun client-handler-error (client e)
   (handler-handle-error (client-error-handler client) e))
 
@@ -57,13 +60,18 @@
 
 (defgeneric send (client metric key value rate))
 
+(defmethod send :around ((client statsd-client-with-prefix) metric key value rate)
+  (if-let ((prefix (client-prefix client)))
+    (call-next-method client metric (concatenate 'string prefix "." key) value rate)
+    (call-next-method)))
+
 (defgeneric stop-client% (client timeout)
   (:method (client timeout)))
 
 (defun stop-client (&key (client *client*) (timeout 10))
   (stop-client% client timeout))
 
-(defclass statsd-client-with-transport (statsd-client-base)
+(defclass statsd-client-with-transport (statsd-client-with-prefix)
   ((transport :initarg :transport :reader client-transport)))
 
 (defmethod stop-client% ((client statsd-client-with-transport) timeout)
