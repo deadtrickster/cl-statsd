@@ -16,6 +16,8 @@
   
   (subtest "Counter"
     (is (with-fake-client (statsd:counter "app.example" 3)) "app.example:3|c")
+    (is (with-fake-client (statsd:inc "app.example")) "app.example:1|c")
+    (is (with-fake-client (statsd:dec "app.example")) "app.example:-1|c")
     (is (with-fake-client (statsd:counter "app.example" 3 :rate 0.23)) "app.example:3|c|@0.23"))
   
   (subtest "Guage"

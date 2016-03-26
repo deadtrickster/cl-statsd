@@ -5,6 +5,12 @@
 (defun counter (key value &key (rate) (client *client*))
   (send client :counter key value rate))
 
+(defun inc (key &key (rate) (client *client*))
+  (send client :counter key 1 rate))
+
+(defun dec (key &key (rate) (client *client*))
+  (send client :counter key -1 rate))
+
 (defun timing (key value &key (rate) (client *client*))
   (send client :timing key value rate))
 
