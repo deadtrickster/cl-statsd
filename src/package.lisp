@@ -5,6 +5,8 @@
   (:nicknames #:statsd)  
   (:shadow #:set)
   (:export #:counter
+           #:inc
+           #:dec
            #:timing
            #:with-timing
            #:guage
