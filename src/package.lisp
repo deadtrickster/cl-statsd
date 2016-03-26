@@ -25,7 +25,7 @@
            #:make-sync-client
            #:make-async-client
            #:start-async-client
-           #:stop-async-client
+           #:stop-client
            ;; errors
            #:transport-error
            #:handler-handle-error))
