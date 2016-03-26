@@ -18,6 +18,7 @@
            #:transport.close
            ;; clients
            #:*client*
+           #:*random-range*
            #:make-null-client
            #:make-fake-client
            #:fake-client-recv
