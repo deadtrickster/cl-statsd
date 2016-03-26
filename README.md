@@ -14,6 +14,18 @@ on busy VM.
 
 ![Result](http://i.imgur.com/mrBf35w.png)
 
+## Metrics API
+
+If you are not familiar with statsd metric types read [this](https://github.com/etsy/statsd/blob/master/docs/metric_types.md) first
+
+- `counter (key value &key (rate) (client *client*))`
+- `inc (key &key (rate) (client *client*))` - shortcut for `(counter key 1 ...)`
+- `dec (key &key (rate) (client *client*))` - shortcut for `(counter key -1 ...)`
+- `timing (key value &key (rate) (client *client*))`
+- `with-timing ((key &optional (client '*client*)) &body body)` - executes body and collects execution time
+- `guage (key value &key (rate) (client *client*))`
+- `set (key value &key (rate) (client *client*))`
+
 ## Error handling
 By default all errors simply ignored. You can customize this behaviour 
 by providing :error-handler strategy:
@@ -26,8 +38,7 @@ by providing :error-handler strategy:
 ```
 New error handling strategies can be created by specializing `handler-handle-error/2`
 
-## Transports
-CL-STATSD comes with the following transports:
+## Clients
 - `null` like /dev/null
 - `fake` queues metrics. Useful for debugging, testing
 ```lisp
@@ -36,7 +47,12 @@ CL-STATSD comes with the following transports:
   (statsd:fake-client-recv))
 "example:62|c"
 ```
-- `usocket` actually sends meterics to statsd
+- `sync` calls transport synchronously
+- `async` more like 'connection-as-a-service', runs in separate thread, all metrics queued first
+
+## Transports
+CL-STATSD comes with the following transport:
+- `usocket` - sends meterics to statsd
 
 New transports can be created by specializing
 - `make-transport`
