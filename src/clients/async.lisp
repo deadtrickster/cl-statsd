@@ -2,14 +2,21 @@
 
 (defconstant +async-client-reconnects-default+ 5)
 
+(defparameter *throttle-threshold* 7000000)
+
+(define-condition throttle-threshold-reached (error)
+  ((threshold :initarg :threshold :reader throttle-threshold)))
+
 (defclass async-client (statsd-client-with-transport)
   ((reconnects :initarg :reconnects :initform +async-client-reconnects-default+ :reader async-client-reconnects)
    (state :initform :created :reader async-client-state)
+   (throttle-threshold :initarg :throttle-threshold :reader async-client-throttle-threshold)
    (thread :reader async-client-thread)
    (mailbox :initform (safe-queue:make-mailbox) :reader async-client-mailbox)))
 
-(defun make-async-client (&key prefix (error-handler :ignore) (transport :usocket) (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (tcp-p))
+(defun make-async-client (&key prefix (throttle-threshold *throttle-threshold*) (error-handler :ignore) (transport :usocket) (host "127.0.0.1") (port 8125) (reconnects +async-client-reconnects-default+) (tcp-p))
   (make-instance 'async-client :prefix prefix
+                               :throttle-threshold throttle-threshold
                                :error-handler error-handler
                                :reconnects reconnects
                                :transport (make-transport transport host port tcp-p)))
@@ -21,7 +28,7 @@
       as recv = (safe-queue:mailbox-receive-message (async-client-mailbox client)) do
          (cond
            ((stringp recv)
-            (let ((retries 1)                  
+            (let ((retries 1)
                   (sleep 1))
               (tagbody
                :retry
@@ -82,5 +89,8 @@
         (:created (start-async-client client))
         (:stopped (error "Async Statsd client stopped"))
         (:running))
+      (let ((tt (async-client-throttle-threshold client)))
+        (when (and tt (< tt (safe-queue:mailbox-count (async-client-mailbox client))))
+          (error 'throttle-threshold-reached :threshole t)))
       (safe-queue:mailbox-send-message (async-client-mailbox client) (serialize-metric metric key value rate))
       value)))

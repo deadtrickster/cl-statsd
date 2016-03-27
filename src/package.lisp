@@ -21,6 +21,7 @@
            ;; clients
            #:*client*
            #:*random-range*
+           #:*throttle-threshold*
            #:make-null-client
            #:make-fake-client
            #:fake-client-recv
@@ -30,4 +31,5 @@
            #:stop-client
            ;; errors
            #:transport-error
-           #:handler-handle-error))
+           #:handler-handle-error
+           #:throttle-threshold-reached))
