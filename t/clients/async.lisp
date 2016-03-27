@@ -13,6 +13,21 @@
       (is (statsd::async-client-state statsd:*client*) :stopped)
       (is (bt:thread-alive-p (statsd::async-client-thread statsd:*client*)) nil)))
 
+  (subtest "Throttle threshold"
+    (is-error
+     (let ((statsd:*client* (statsd:make-async-client :error-handler :throw
+                                                      :throttle-threshold 5)))
+       (loop for i from 0 to 999999 do
+                (statsd:counter "example" (random 100))))
+     'statsd:throttle-threshold-reached "Can set throttle threshold per client")
+
+    (is-error
+     (let* ((statsd:*throttle-threshold* 5)
+            (statsd:*client* (statsd:make-async-client :error-handler :throw)))
+       (loop for i from 0 to 999999 do
+                (statsd:counter "example" (random 100))))
+     'statsd:throttle-threshold-reached "Can set throttle threshold globally"))
+
   (subtest "Ignore errors"
     (let ((statsd:*client* (statsd:make-async-client :error-handler :ignore))
           (ret))
@@ -27,7 +42,7 @@
       (is-error
        (loop for i from 0 to 3 do
                 (setf ret (statsd:counter "example" i :rate :qwe)))
-       'error)      
+       'error)
       (statsd:stop-client)))
 
   (subtest "Reconnects if reconnects > 1"
