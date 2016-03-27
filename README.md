@@ -26,6 +26,8 @@ If you are not familiar with statsd metric types read [this](https://github.com/
 - `guage (key value &key (rate) (client *client*))`
 - `set (key value &key (rate) (client *client*))`
 
+Sampling rate can be controlled using `*random-range*` parameter (default is 100). If set to 0 turns off sampling completely (equivalent of constant rate 1) 
+
 ## Error handling
 By default all errors simply ignored. You can customize this behaviour 
 by providing :error-handler strategy:
@@ -39,16 +41,28 @@ by providing :error-handler strategy:
 New error handling strategies can be created by specializing `handler-handle-error/2`
 
 ## Clients
-- `null` like /dev/null
-- `fake` queues metrics. Useful for debugging, testing
+#### `null`
+Like /dev/null
+#### `fake`
+Queues metrics. Useful for debugging, testing
 ```lisp
 (let ((statsd::*client* (statsd:make-fake-client)))
   (statsd:counter "example" (random 100))
   (statsd:fake-client-recv))
 "example:62|c"
 ```
-- `sync` calls transport synchronously
-- `async` more like 'connection-as-a-service', runs in separate thread, all metrics queued first
+#### `sync`
+Calls transport synchronously
+#### `async` 
+More like 'connection-as-a-service', runs in separate thread, all metrics queued first. To prevent queue from overgrowing async client understands throttling threshold (i.e. max queue length):
+```lisp
+(let ((statsd:*client* (statsd:make-async-client :error-handler :throw
+                                                 :throttle-threshold 5)))
+  (loop for i from 0 to 999999 do
+        (statsd:counter "example" (random 100))))
+; Evaluation aborted on #<CL-STATSD:THROTTLE-THRESHOLD-REACHED {100414CEF3}>.
+```
+Throttle threshold can be set globally using `*throttle-threshold*` value or per async client (`:throttle-threshold` parameter).
 
 ## Transports
 CL-STATSD comes with the following transport:
@@ -62,7 +76,7 @@ New transports can be created by specializing
 
 
 ## TODO
-- [ ] Async client throttling
+- [x] Async client throttling
 - [ ] Travis CI integration
 - [ ] Pipelines
 
