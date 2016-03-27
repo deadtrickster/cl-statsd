@@ -26,6 +26,8 @@ If you are not familiar with statsd metric types read [this](https://github.com/
 - `guage (key value &key (rate) (client *client*))`
 - `set (key value &key (rate) (client *client*))`
 
+Sampling rate can be controlled using `*random-range*` parameter (default is 100). If set to 0 turns off sampling completely (equivalent of constant rate 1) 
+
 ## Error handling
 By default all errors simply ignored. You can customize this behaviour 
 by providing :error-handler strategy:
