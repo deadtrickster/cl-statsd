@@ -25,7 +25,7 @@
                  (:module "clients"
                   :serial t
                   :components
-                  ((:file "fake")
+                  ((:file "capture")
                    (:file "null")
                    (:file "sync")
                    (:file "async"))))))

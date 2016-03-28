@@ -2,7 +2,7 @@
 
 (defpackage #:cl-statsd
   (:use #:cl #:alexandria)
-  (:nicknames #:statsd)  
+  (:nicknames #:statsd)
   (:shadow #:set)
   (:export #:counter
            #:inc
@@ -23,8 +23,9 @@
            #:*random-range*
            #:*throttle-threshold*
            #:make-null-client
-           #:make-fake-client
-           #:fake-client-recv
+           #:make-capture-client
+           #:capture-client.recv
+           #:capture-client.reset
            #:make-sync-client
            #:make-async-client
            #:start-async-client

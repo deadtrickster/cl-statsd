@@ -43,12 +43,12 @@ New error handling strategies can be created by specializing `handler-handle-err
 ## Clients
 #### `null`
 Like /dev/null
-#### `fake`
+#### `capture`
 Queues metrics. Useful for debugging, testing
 ```lisp
-(let ((statsd::*client* (statsd:make-fake-client)))
+(let ((statsd::*client* (statsd:make-capture-client)))
   (statsd:counter "example" (random 100))
-  (statsd:fake-client-recv))
+  (statsd:capture-client.recv))
 "example:62|c"
 ```
 #### `sync`
