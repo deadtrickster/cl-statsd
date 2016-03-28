@@ -1,5 +1,8 @@
 ## [StatsD](https://github.com/etsy/statsd) client in Common Lisp
 
+If you are not familiar with statsd read [this](https://codeascraft.com/2011/02/15/measure-anything-measure-everything/).
+To learn about statsd metric types read [this](https://github.com/etsy/statsd/blob/master/docs/metric_types.md).
+
 ## Speed
 CL-STATSD is relatively fast:
 
@@ -16,8 +19,6 @@ on busy VM.
 
 ## Metrics API
 
-If you are not familiar with statsd metric types read [this](https://github.com/etsy/statsd/blob/master/docs/metric_types.md) first
-
 - `counter (key value &key (rate) (client *client*))`
 - `inc (key &key (rate) (client *client*))` - shortcut for `(counter key 1 ...)`
 - `dec (key &key (rate) (client *client*))` - shortcut for `(counter key -1 ...)`
@@ -26,7 +27,16 @@ If you are not familiar with statsd metric types read [this](https://github.com/
 - `guage (key value &key (rate) (client *client*))`
 - `set (key value &key (rate) (client *client*))`
 
-Sampling rate can be controlled using `*random-range*` parameter (default is 100). If set to 0 turns off sampling completely (equivalent of constant rate 1) 
+Sampling rate can be controlled using `*random-range*` parameter (default is 100). If set to 0 turns off sampling completely (equivalent of constant rate 1)
+
+## Pipelining
+Given `statsd:*client*` is bound you can write something like this:
+```lisp
+(statsd:pipeline ()
+  (statsd:inc "qwe")
+  (statsd:inc "ewq"))
+```
+Pipelining implemented using 'wrapper' client that gathers metrics, concatenates them and sends directly to the wrapped client transport. Currently CL-STATSD makes no effort to split pipelined data or otherwise respect/detect MTU.
 
 ## Error handling
 By default all errors simply ignored. You can customize this behaviour 
