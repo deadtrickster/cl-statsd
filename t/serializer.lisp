@@ -1,11 +1,5 @@
 (in-package :cl-statsd.test)
 
-(defmacro with-capture-client (&body body)
-  `(let ((statsd:*client* (statsd:make-capture-client))
-         (statsd:*random-range* 0))
-     ,@body
-     (statsd:capture-client.recv)))
-
 (plan 1)
 
 (subtest "Protocol serializer"

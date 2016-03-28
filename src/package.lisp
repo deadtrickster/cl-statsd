@@ -30,6 +30,8 @@
            #:make-async-client
            #:start-async-client
            #:stop-client
+           ;; pipeline
+           #:pipeline
            ;; errors
            #:transport-error
            #:handler-handle-error
