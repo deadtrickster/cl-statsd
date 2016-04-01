@@ -1,6 +1,6 @@
 (asdf:defsystem :cl-statsd
   :serial t
-  :version "0.2"
+  :version "0.2.1"
   :license "MIT"
   :depends-on ("alexandria"
                "cl-interpol"
