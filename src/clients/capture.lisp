@@ -1,6 +1,6 @@
 (in-package :cl-statsd)
 
-(defclass capture-client (statsd-client-with-prefix, transport-base)
+(defclass capture-client (statsd-client-with-prefix transport-base)
   ((queue :initform (safe-queue:make-queue) :accessor capture-client-queue)))
 
 (defun make-capture-client (&key prefix)
