@@ -9,7 +9,7 @@
            #:dec
            #:timing
            #:with-timing
-           #:guage
+           #:gauge
            #:set
            ;; transports
            #:transport-base
