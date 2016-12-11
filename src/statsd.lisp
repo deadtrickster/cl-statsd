@@ -14,8 +14,8 @@
 (defun timing (key value &key (rate) (client *client*))
   (send client :timing key value rate))
 
-(defun guage (key value &key (rate) (client *client*))
-  (send client :guage key value rate))
+(defun gauge (key value &key (rate) (client *client*))
+  (send client :gauge key value rate))
 
 (defun set (key value &key (rate) (client *client*))
   (send client :set key value rate))

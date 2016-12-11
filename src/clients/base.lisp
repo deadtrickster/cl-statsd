@@ -52,7 +52,7 @@
 (defmethod serialize-metric ((metric (eql :timing)) key value rate)
   (serialize-metric% "ms" key value rate))
 
-(defmethod serialize-metric ((metric (eql :guage)) key value rate)
+(defmethod serialize-metric ((metric (eql :gauge)) key value rate)
   (serialize-metric% "g" key value rate))
 
 (defmethod serialize-metric ((metric (eql :set)) key value rate)

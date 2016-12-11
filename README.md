@@ -24,7 +24,7 @@ on busy VM.
 - `dec (key &key (rate) (client *client*))` - shortcut for `(counter key -1 ...)`
 - `timing (key value &key (rate) (client *client*))`
 - `with-timing ((key &optional (client '*client*)) &body body)` - executes body and collects execution time
-- `guage (key value &key (rate) (client *client*))`
+- `gauge (key value &key (rate) (client *client*))`
 - `set (key value &key (rate) (client *client*))`
 
 Sampling rate can be controlled using `*random-range*` parameter (default is 100). If set to 0 turns off sampling completely (equivalent of constant rate 1)
@@ -39,7 +39,7 @@ Given `statsd:*client*` is bound you can write something like this:
 Pipelining implemented using 'wrapper' client that gathers metrics, concatenates them and sends directly to the wrapped client transport. Currently CL-STATSD makes no effort to split pipelined data or otherwise respect/detect MTU.
 
 ## Error handling
-By default all errors simply ignored. You can customize this behaviour 
+By default all errors simply ignored. You can customize this behaviour
 by providing :error-handler strategy:
 ```lisp
 (let ((statsd:*client* (statsd:make-sync-client :error-handler :throw)))
@@ -63,7 +63,7 @@ Queues metrics. Useful for debugging, testing
 ```
 #### `sync`
 Calls transport synchronously
-#### `async` 
+#### `async`
 More like 'connection-as-a-service', runs in separate thread, all metrics queued first. To prevent queue from overgrowing async client understands throttling threshold (i.e. max queue length):
 ```lisp
 (let ((statsd:*client* (statsd:make-async-client :error-handler :throw

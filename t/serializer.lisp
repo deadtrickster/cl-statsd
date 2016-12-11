@@ -7,16 +7,16 @@
     (let ((statsd:*client* (statsd:make-capture-client :prefix "qwe")))
       (statsd:counter "qwe" 1)
       (is (statsd:capture-client.recv) "qwe.qwe:1|c")))
-  
+
   (subtest "Counter"
     (is (with-capture-client (statsd:counter "app.example" 3)) "app.example:3|c")
     (is (with-capture-client (statsd:inc "app.example")) "app.example:1|c")
     (is (with-capture-client (statsd:dec "app.example")) "app.example:-1|c")
     (is (with-capture-client (statsd:counter "app.example" 3 :rate 0.23)) "app.example:3|c|@0.23"))
-  
-  (subtest "Guage"
-    (is (with-capture-client (statsd:guage "app.example" 3)) "app.example:3|g")
-    (is (with-capture-client (statsd:guage "app.example" 3 :rate 0.23)) "app.example:3|g|@0.23"))
+
+  (subtest "Gauge"
+    (is (with-capture-client (statsd:gauge "app.example" 3)) "app.example:3|g")
+    (is (with-capture-client (statsd:gauge "app.example" 3 :rate 0.23)) "app.example:3|g|@0.23"))
 
   (subtest "Set"
     (is (with-capture-client (statsd:set "app.example" 3)) "app.example:3|s")
